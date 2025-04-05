@@ -4,7 +4,7 @@
 
 ## Installation
 
-### Prerequisites:
+0. Prerequisites:
 - Install Docker: [docker ce](https://docs.docker.com/engine/install/ubuntu/)
 - Install [Anaconda](https://www.anaconda.com/distribution/)
 
