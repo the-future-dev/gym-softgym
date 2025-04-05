@@ -1,25 +1,71 @@
 # SoftGym
 <a href="https://sites.google.com/view/softgym/home">SoftGym</a> is a set of benchmark environments for deformable object manipulation including tasks involving fluid, cloth and rope. It is built on top of the Nvidia FleX simulator and has standard Gym API for interaction with RL agents. A number of RL algorithms benchmarked on SoftGym can be found in <a href="https://github.com/Xingyu-Lin/softagent">SoftAgent</a>
 
-## Latest updates
 
-- [12/06/2021] Support depth rendering. Example:`python examples/random_env.py --test_depth 1` to visualize the depth image.
+## Installation
 
-## Using Docker
-If you are using Ubuntu 16.04 LTS and CUDA 9.2, you can follow the steps in the next section on this page for compilation. For other versions of Ubuntu or CUDA, we provide the pre-built Docker image and Dockerfile for running SoftGym. Please refer to our [Docker](docker/docker.md) page.
+### Prerequisites:
+- Install Docker: [docker ce](https://docs.docker.com/engine/install/ubuntu/)
+- Install [Anaconda](https://www.anaconda.com/distribution/)
 
-## Instructions for Installation
-1. This codebase is tested with Ubuntu 16.04 LTS, CUDA 9.2 and Nvidia driver version 440.64. Other versions might work but are not guaranteed, especially with a different driver version. Please use our docker for other versions.
-
-The following command will install some necessary dependencies.
+1. Install dependencies:
 ```
 sudo apt-get install build-essential libgl1-mesa-dev freeglut3-dev libglfw3 libgles2-mesa-dev
 ```
 
-2. Create conda environment
-   Create a conda environment and activate it: `conda env create -f environment.yml`
+2. Conda environment
+   Create a conda environment and activate it:
+   ```
+   conda env create -f environment.yml
+   conda activate softgym
+   ```
 
-3. Compile PyFleX: Go to the root folder of softgym and run `. ./prepare_1.0.sh`. After that, compile PyFleX with CMake & Pybind11 by running `. ./compile_1.0.sh` Please see the example test scripts and the bottom of `bindings/pyflex.cpp` for available APIs.
+3. Compile PyFleX:
+    Pyflex is a C++ library used in the repository to simulate deformable objects.
+
+    First, generate the variables:    
+    ```
+    export PATH_TO_SOFTGYM=~/your_path_to_softgym/
+    ```
+    ```
+    export PATH_TO_CONDA=~/your_path_to_conda/ # ex: /home/user/miniconda3/
+    ```
+
+    Then let us use docker to compile PyFleX:
+    ```
+    sudo docker pull xingyu/softgym:latest
+
+    sudo docker run \
+        -v $PATH_TO_SOFTGYM:/workspace/softgym \
+        -v $PATH_TO_CONDA:$PATH_TO_CONDA \
+        -v /tmp/.X11-unix:/tmp/.X11-unix \
+        -e DISPLAY=$DISPLAY \
+        -e QT_X11_NO_MITSHM=1 \
+        -it xingyu/softgym:latest bash
+    ```
+    
+    Now inside the docker container:
+    ```
+    cd /workspace/softgym
+    . ./prepare_1.0.sh
+    . ./compile_1.0.sh
+    ```
+
+    Finally you can exit the docker container by typing `exit`.
+
+    Let us source pyflex and softgym:
+    ```    
+    export PYFLEXROOT=${PWD}/PyFlex
+    export PYTHONPATH=${PYFLEXROOT}/bindings/build:$PYTHONPATH
+    export LD_LIBRARY_PATH=${PYFLEXROOT}/external/SDL2-2.0.4/lib/x64:$LD_LIBRARY_PATH
+    ```
+
+    Optionally, you can add the above lines to your `~/.bashrc` file.
+
+    Now you can test the installation by running:
+    ```
+    python examples/random_env.py --env_name ClothDrop
+    ```
 
 ## SoftGym Environments
 |Image|Name|Description|
